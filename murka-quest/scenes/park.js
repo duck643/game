@@ -11,7 +11,7 @@ const parkScenes = {
     
     taxi_reaction: {
         name: "Мурка",
-        text: "Ну ничего себе, закрывшиеся люди. Я денег не дам, у тебя есть? Пошли пешком обгонять электросамокатчиков.",
+        text: "Ну ничего себе, зажравшиеся люди. Я денег не дам, у тебя есть? Пошли пешком обгонять электросамокатчиков.",
         choices: [
             { text: "Ладно, играем", next: 'scooters_game_intro' }
         ]
@@ -21,8 +21,11 @@ const parkScenes = {
         name: "Мурка",
         text: "Пф... Нищеброды... Ладно, давай играть.",
         choices: [
-            { text: "НАЧАТЬ ИГРУ", next: 'after_scooters', action: () => startScootersGame() }
-        ]
+            { text: "НАЧАТЬ ИГРУ", next: 'after_scooters' }
+        ],
+        onEnter: () => {
+            setTimeout(() => startScootersGame(), 100);
+        }
     },
     
     // === ПОСЛЕ ИГРЫ ===
