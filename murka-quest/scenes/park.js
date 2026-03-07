@@ -21,11 +21,16 @@ const parkScenes = {
         name: "Мурка",
         text: "Пф... Нищеброды... Ладно, давай играть.",
         choices: [
-            { text: "НАЧАТЬ ИГРУ", next: 'after_scooters' }
-        ],
-        onEnter: () => {
-            setTimeout(() => startScootersGame(), 100);
-        }
+            { 
+                text: "НАЧАТЬ ИГРУ", 
+                next: 'after_scooters',
+                onClick: () => {
+                    if (typeof startScootersGame === 'function') {
+                        startScootersGame();
+                    }
+                }
+            }
+        ]
     },
     
     // === ПОСЛЕ ИГРЫ ===
