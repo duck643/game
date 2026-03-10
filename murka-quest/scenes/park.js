@@ -1,297 +1,136 @@
 const parkScenes = {
-    // === ВЫБОР: САМОКАТЫ ИЛИ ТАКСИ ===
     scooters_choice: {
-        name: "Мурка",
+        name: "Аноним",
         text: "По пути в парк много электросамокатчиков... Закажем такси или поиграем?",
         choices: [
-            { text: "а) Поиграем!", next: 'scooters_game_intro' },
+            { text: "а) Поиграем!", next: 'scooters_play_intro' },
             { text: "б) Такси", next: 'taxi_reaction' }
         ]
     },
     
     taxi_reaction: {
-        name: "Мурка",
-        text: "Ну ничего себе, зажравшиеся люди. Я денег не дам, у тебя есть? Пошли пешком обгонять электросамокатчиков.",
-        choices: [
-            { text: "Ладно, играем", next: 'scooters_game_intro' }
-        ]
+        name: "Аноним",
+        text: "Ну ничего себе, зажравшиеся люди. Я денег не дам, у тебя есть?\nПошли пешком обгонять электросамокатчиков.",
+        choices: [{ text: "Ладно, играем", next: 'scooters_play_intro' }]
     },
     
-    scooters_game_intro: {
-        name: "Мурка",
+    scooters_play_intro: {
+        name: "Аноним",
         text: "Пф... Нищеброды... Ладно, давай играть.",
-        choices: [
-            { text: "НАЧАТЬ ИГРУ", next: 'scooters_game_play' }
-        ]
+        choices: [{ text: "НАЧАТЬ ИГРУ", next: 'scooters_game' }]
     },
     
-    // === РАБОЧАЯ МИНИ-ИГРА ===
-    scooters_game_play: {
+    scooters_game: {
         name: "",
         hideDialogue: true,
         customContent: () => `
-            <div style="text-align: center; color: white; padding: 20px;">
-                <h2 style="margin-bottom: 10px;">🛴 Обгоняй самокаты! 🎯</h2>
-                <p style="margin-bottom: 20px;">Стрелки ⬆️️ - движение, Пробел - стрельба</p>
-                <div style="font-size: 20px; margin-bottom: 10px;">Счёт: <span id="game-score">0</span> | Жизни: <span id="game-lives">3</span></div>
-                <div id="scooters-game-area" style="
-                    width: 800px; 
-                    height: 400px; 
-                    background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 100%);
-                    margin: 0 auto;
-                    border-radius: 10px;
-                    position: relative;
-                    overflow: hidden;
-                    border: 3px solid #0f3460;
-                ">
-                    <div id="player" style="
-                        width: 50px;
-                        height: 50px;
-                        background: #00d9ff;
-                        border-radius: 50%;
-                        position: absolute;
-                        left: 50px;
-                        top: 175px;
-                        box-shadow: 0 0 20px #00d9ff;
-                        transition: transform 0.1s;
-                    ">🏃</div>
+            <div style="text-align:center;color:white;padding:20px">
+                <h2>🛴 Обгоняй самокаты! 🎯</h2>
+                <p>Стрелки ⬆️⬇️ - движение, Пробел - стрельба</p>
+                <div style="font-size:20px;margin:10px">Счёт: <span id="gscore">0</span> | Жизни: <span id="glives">3</span></div>
+                <div id="garea" style="width:800px;height:400px;background:linear-gradient(to bottom,#1a1a2e,#16213e);margin:0 auto;border-radius:10px;position:relative;overflow:hidden;border:3px solid #0f3460">
+                    <div id="gplayer" style="width:50px;height:50px;background:#00d9ff;border-radius:50%;position:absolute;left:50px;top:175px;box-shadow:0 0 20px #00d9ff">🏃</div>
                 </div>
-                <button id="finish-game-btn" class="start-btn" style="margin-top: 20px; display: none;" onclick="showScene('after_scooters')">
-                    ПРОДОЛЖИТЬ
-                </button>
+                <button id="gfinish" class="start-btn" style="margin-top:20px;display:none" onclick="showScene('after_scooters')">ПРОДОЛЖИТЬ</button>
             </div>
         `,
-        onEnter: () => {
-            setTimeout(initScootersMiniGame, 100);
-        }
+        onEnter: () => setTimeout(initScootersGame, 100)
     },
     
-    // === ПОСЛЕ ИГРЫ ===
     after_scooters: {
-        name: "Мурка",
-        text: "Чтош... Всё не так безнадёжно. И вот мы в парке. Как тебе тут?",
+        name: "Аноним",
+        text: "Чтож... Всё не так безнадежно. И вот мы в парке. Как тебе тут?",
         choices: [
-            { text: "а) Хочу домой", next: 'park_reaction_sad' },
-            { text: "б) Ну норм", next: 'park_reaction_sad' },
-            { text: "в) Обожаю парки!", next: 'optimist_test' }
+            { text: "а) Хочу домой", next: 'park_sad' },
+            { text: "б) Ну норм", next: 'park_sad' },
+            { text: "в) Обожаю парки!", next: 'park_optimist' }
         ]
     },
     
-    park_reaction_sad: {
-        name: "Мурка",
+    park_sad: {
+        name: "Аноним",
         text: "Обидно... Я так долго выбирал парк...",
-        choices: [
-            { text: "Далее", next: 'maze_intro' }
-        ]
+        choices: [{ text: "Далее", next: 'maze_intro' }]
     },
     
-    optimist_test: {
-        name: "Мурка",
-        text: "Оптимистов никто не любит... Пройди-ка тест: https://duck643.github.io/testnormis/",
-        customContent: () => `
-            <div style="text-align: center; margin: 100px 0;">
-                <a href="https://duck643.github.io/testnormis/" target="_blank" class="start-btn" style="display: inline-block; padding: 20px 40px; font-size: 24px; background: #9B59B6; color: white; text-decoration: none; border-radius: 10px;">
-                    ОТКРЫТЬ ТЕСТ ↗
-                </a>
-            </div>
-        `,
-        choices: [
-            { text: "Прошёл тест. Далее", next: 'maze_intro' }
-        ]
+    park_optimist: {
+        name: "Аноним",
+        text: "Оптимистов никто не любит... Пройди-ка тест:",
+        customContent: () => `<div style="text-align:center;margin:50px 0"><a href="https://duck643.github.io/testnormis/" target="_blank" class="start-btn">ОТКРЫТЬ ТЕСТ ↗</a></div>`,
+        choices: [{ text: "Прошёл тест. Далее", next: 'maze_intro' }]
     }
 };
 
-// === РАБОЧАЯ МИНИ-ИГРА ===
-let gameInterval;
-let spawnInterval;
-let playerY = 175;
-let score = 0;
-let lives = 3;
-let gameActive = false;
-let obstacles = [];
-let projectiles = [];
+// === МИНИ-ИГРА С САМОКАТАМИ ===
+let gInterval, gSpawn, gY=175, gScore=0, gLives=3, gActive=false, gObs=[], gProj=[];
 
-function initScootersMiniGame() {
-    const gameArea = document.getElementById('scooters-game-area');
-    const player = document.getElementById('player');
-    if (!gameArea || !player) return;
-    
-    gameActive = true;
-    playerY = 175;
-    score = 0;
-    lives = 3;
-    obstacles = [];
-    projectiles = [];
-    
+function initScootersGame() {
+    const area = document.getElementById('garea'), player = document.getElementById('gplayer');
+    if (!area || !player) return;
+    gActive = true; gY=175; gScore=0; gLives=3; gObs=[]; gProj=[];
     updateGameUI();
-    
-    // Управление
     document.addEventListener('keydown', handleGameInput);
-    
-    // Спавн самокатов
-    spawnInterval = setInterval(() => {
-        if (!gameActive) return;
-        spawnScooter();
-    }, 1500);
-    
-    // Игровой цикл
-    gameInterval = setInterval(() => {
-        if (!gameActive) return;
-        updateGame();
-    }, 50);
-    
-    // Автозавершение через 15 секунд
-    setTimeout(() => {
-        endMiniGame();
-    }, 15000);
+    gSpawn = setInterval(() => { if(gActive) spawnObstacle(); }, 1500);
+    gInterval = setInterval(updateGame, 50);
+    setTimeout(endGame, 15000);
 }
 
 function handleGameInput(e) {
-    const player = document.getElementById('player');
-    if (!player || !gameActive) return;
-    
-    if (e.key === 'ArrowUp' && playerY > 0) {
-        playerY -= 30;
-        player.style.top = playerY + 'px';
-    }
-    if (e.key === 'ArrowDown' && playerY < 350) {
-        playerY += 30;
-        player.style.top = playerY + 'px';
-    }
-    if (e.key === ' ' || e.key === 'Spacebar') {
-        shootProjectile();
-    }
+    const p = document.getElementById('gplayer');
+    if (!p || !gActive) return;
+    if (e.key==='ArrowUp' && gY>0) { gY-=30; p.style.top=gY+'px'; }
+    if (e.key==='ArrowDown' && gY<350) { gY+=30; p.style.top=gY+'px'; }
+    if (e.key===' ' || e.key==='Spacebar') shoot();
 }
 
-function spawnScooter() {
-    const gameArea = document.getElementById('scooters-game-area');
-    const scooter = document.createElement('div');
-    scooter.className = 'scooter-obstacle';
-    scooter.style.cssText = `
-        width: 60px;
-        height: 60px;
-        background: #ff6b6b;
-        position: absolute;
-        right: 0;
-        top: ${Math.random() * 300}px;
-        border-radius: 10px;
-        font-size: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 0 15px #ff6b6b;
-    `;
-    scooter.textContent = '🛴';
-    gameArea.appendChild(scooter);
-    obstacles.push({ element: scooter, x: 800, y: parseFloat(scooter.style.top) });
+function spawnObstacle() {
+    const area = document.getElementById('garea');
+    const obs = document.createElement('div');
+    obs.style.cssText = `width:60px;height:60px;background:#ff6b6b;position:absolute;right:0;top:${Math.random()*300}px;border-radius:10px;font-size:40px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px #ff6b6b`;
+    obs.textContent = '🛴';
+    area.appendChild(obs);
+    gObs.push({el:obs, x:800, y:parseFloat(obs.style.top)});
 }
 
-function shootProjectile() {
-    const gameArea = document.getElementById('scooters-game-area');
-    const player = document.getElementById('player');
-    const projectile = document.createElement('div');
-    projectile.className = 'projectile';
-    projectile.style.cssText = `
-        width: 30px;
-        height: 10px;
-        background: #ffd93d;
-        position: absolute;
-        left: 100px;
-        top: ${playerY + 20}px;
-        border-radius: 5px;
-        box-shadow: 0 0 10px #ffd93d;
-    `;
-    gameArea.appendChild(projectile);
-    projectiles.push({ element: projectile, x: 100, y: playerY + 20 });
+function shoot() {
+    const area = document.getElementById('garea');
+    const proj = document.createElement('div');
+    proj.style.cssText = `width:30px;height:10px;background:#ffd93d;position:absolute;left:100px;top:${gY+20}px;border-radius:5px;box-shadow:0 0 10px #ffd93d`;
+    area.appendChild(proj);
+    gProj.push({el:proj, x:100, y:gY+20});
 }
 
 function updateGame() {
-    const player = document.getElementById('player');
-    const playerRect = player.getBoundingClientRect();
-    
-    // Двигаем самокаты
-    obstacles.forEach((obs, index) => {
-        obs.x -= 5;
-        obs.element.style.right = (800 - obs.x) + 'px';
-        
-        // Проверка столкновения с игроком
-        const obsRect = obs.element.getBoundingClientRect();
-        if (playerRect.left < obsRect.right &&
-            playerRect.right > obsRect.left &&
-            playerRect.top < obsRect.bottom &&
-            playerRect.bottom > obsRect.top) {
-            // Столкновение!
-            obs.element.remove();
-            obstacles.splice(index, 1);
-            lives--;
-            updateGameUI();
-            
-            if (lives <= 0) {
-                endMiniGame();
-            }
+    const p = document.getElementById('gplayer'), pr = p?.getBoundingClientRect();
+    gObs.forEach((o,i) => {
+        o.x -= 5; o.el.style.right = (800-o.x)+'px';
+        const or = o.el.getBoundingClientRect();
+        if (pr?.left<or.right && pr?.right>or.left && pr?.top<or.bottom && pr?.bottom>or.top) {
+            o.el.remove(); gObs.splice(i,1); gLives--; updateGameUI();
+            if (gLives<=0) endGame();
         }
-        
-        // Удаление если ушёл за экран
-        if (obs.x < -100) {
-            obs.element.remove();
-            obstacles.splice(index, 1);
-            score++;
-            updateGameUI();
-        }
+        if (o.x<-100) { o.el.remove(); gObs.splice(i,1); gScore++; updateGameUI(); }
     });
-    
-    // Двигаем снаряды
-    projectiles.forEach((proj, pIndex) => {
-        proj.x += 15;
-        proj.element.style.left = proj.x + 'px';
-        
-        // Проверка попадания в самокаты
-        obstacles.forEach((obs, obsIndex) => {
-            const projRect = proj.element.getBoundingClientRect();
-            const obsRect = obs.element.getBoundingClientRect();
-            
-            if (projRect.left < obsRect.right &&
-                projRect.right > obsRect.left &&
-                projRect.top < obsRect.bottom &&
-                projRect.bottom > obsRect.top) {
-                // Попадание!
-                proj.element.remove();
-                obs.element.remove();
-                projectiles.splice(pIndex, 1);
-                obstacles.splice(obsIndex, 1);
-                score += 2;
-                updateGameUI();
+    gProj.forEach((p,i) => {
+        p.x += 15; p.el.style.left = p.x+'px';
+        gObs.forEach((o,oi) => {
+            const pr=p.el.getBoundingClientRect(), or=o.el.getBoundingClientRect();
+            if (pr.left<or.right && pr.right>or.left && pr.top<or.bottom && pr.bottom>or.top) {
+                p.el.remove(); o.el.remove(); gProj.splice(i,1); gObs.splice(oi,1); gScore+=2; updateGameUI();
             }
         });
-        
-        // Удаление снаряда если ушёл за экран
-        if (proj.x > 800) {
-            proj.element.remove();
-            projectiles.splice(pIndex, 1);
-        }
+        if (p.x>800) { p.el.remove(); gProj.splice(i,1); }
     });
 }
 
 function updateGameUI() {
-    const scoreEl = document.getElementById('game-score');
-    const livesEl = document.getElementById('game-lives');
-    if (scoreEl) scoreEl.textContent = score;
-    if (livesEl) livesEl.textContent = lives;
+    const s=document.getElementById('gscore'), l=document.getElementById('glives');
+    if(s) s.textContent=gScore; if(l) l.textContent=gLives;
 }
 
-function endMiniGame() {
-    gameActive = false;
-    clearInterval(gameInterval);
-    clearInterval(spawnInterval);
+function endGame() {
+    gActive=false; clearInterval(gInterval); clearInterval(gSpawn);
     document.removeEventListener('keydown', handleGameInput);
-    
-    // Показываем кнопку "Продолжить"
-    const finishBtn = document.getElementById('finish-game-btn');
-    if (finishBtn) {
-        finishBtn.style.display = 'inline-block';
-    }
-    
-    // Очищаем игровое поле
-    obstacles.forEach(obs => obs.element.remove());
-    projectiles.forEach(proj => proj.element.remove());
+    const btn=document.getElementById('gfinish'); if(btn) btn.style.display='inline-block';
+    gObs.forEach(o=>o.el.remove()); gProj.forEach(p=>p.el.remove());
 }
