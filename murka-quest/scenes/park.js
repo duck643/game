@@ -4,7 +4,7 @@ const parkScenes = {
         name: "Мурка",
         text: "По пути в парк много электросамокатчиков... Закажем такси или поиграем?",
         choices: [
-            { text: "а) Поиграем!", next: "scooters" },
+            { text: "а) Поиграем!", next: 'scooters_game_intro' },
             { text: "б) Такси", next: 'taxi_reaction' }
         ]
     },
@@ -13,7 +13,7 @@ const parkScenes = {
         name: "Мурка",
         text: "Ну ничего себе, зажравшиеся люди. Я денег не дам, у тебя есть? Пошли пешком обгонять электросамокатчиков.",
         choices: [
-            { text: "Ладно, играем", next: "scooters" }
+            { text: "Ладно, играем", next: 'scooters_game_intro' }
         ]
     },
     
@@ -21,35 +21,24 @@ const parkScenes = {
         name: "Мурка",
         text: "Пф... Нищеброды... Ладно, давай играть.",
         choices: [
-            { text: "НАЧАТЬ ИГРУ", next: "scooters" }
-        ]
-    },
-    
-    // Мини-игра с самокатами (простая версия)
-    scooters_game_play: {
-        name: "",
-        hideDialogue: true,
-        customContent: () => `
-            <div style="text-align: center; padding: 100px; color: white; min-height: 500px;">
-                <h2 style="font-size: 48px; margin-bottom: 30px;">🛴 Игра с самокатами 🛴</h2>
-                <div style="font-size: 100px; margin: 40px; animation: bounce 1s infinite;">🏃♂️🎯</div>
-                <p style="font-size: 24px; margin: 30px;">Ты обгоняешь электросамокатчиков и стреляешь в них!</p>
-                <div style="margin: 40px; padding: 30px; background: rgba(255,255,255,0.1); border-radius: 15px;">
-                    <p style="font-size: 20px;">🎮 Управление:</p>
-                    <p>⬆️️ Стрелки - движение</p>
-                    <p>Пробел - стрельба</p>
-                </div>
-                <button class="start-btn" onclick="showScene('after_scooters')" style="margin-top: 30px; padding: 20px 60px; font-size: 24px;">
-                    ЗАВЕРШИТЬ ИГРУ
-                </button>
-            </div>
-            <style>
-                @keyframes bounce {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-20px); }
-                }
-            </style>
-        `
+            { text: "НАЧАТЬ ИГРУ", next: 'after_scooters' }
+        ],
+        onEnter: () => {
+            // Запускаем простую версию игры
+            setTimeout(() => {
+                const container = document.getElementById('game-container');
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 100px; color: white; min-height: 500px;">
+                        <h2 style="font-size: 48px; margin-bottom: 30px;">🛴 Игра с самокатами 🛴</h2>
+                        <div style="font-size: 100px; margin: 40px;">🏃♂️💨🎯</div>
+                        <p style="font-size: 24px; margin: 30px;">Ты обогнал всех самокатчиков!</p>
+                        <button class="start-btn" onclick="showScene('after_scooters')" style="margin-top: 30px;">
+                            ПРОДОЛЖИТЬ
+                        </button>
+                    </div>
+                `;
+            }, 100);
+        }
     },
     
     // === ПОСЛЕ ИГРЫ ===
