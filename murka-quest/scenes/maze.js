@@ -9,18 +9,27 @@ const mazeScenes = {
     maze_game: {
         name: "",
         hideDialogue: true,
-        customContent: () => `
-            <div style="text-align:center;color:white;padding:20px">
-                <h2>🌀 Пройди лабиринт! 🎯</h2>
-                <p>Стрелки ⬆️⬇️⬅️➡️ - движение. Доберись до зелёного выхода!</p>
-                <div id="maze-area" style="width:600px;height:400px;background:#1a1a2e;margin:0 auto;border-radius:10px;position:relative;overflow:hidden;border:3px solid #0f3460">
-                    <div id="maze-player" style="width:25px;height:25px;background:#00d9ff;border-radius:50%;position:absolute;left:10px;top:187px;box-shadow:0 0 15px #00d9ff;z-index:10">🏃</div>
-                    <div id="maze-exit" style="width:40px;height:40px;background:#2ecc71;position:absolute;right:10px;top:180px;border-radius:5px;box-shadow:0 0 20px #2ecc71">🎯</div>
+        customContent: () => {
+            console.log('🔷 maze_game: customContent вызван');
+            return `
+                <div style="text-align:center;color:white;padding:20px">
+                    <h2>🌀 Пройди лабиринт! 🎯</h2>
+                    <p>Стрелки ⬆️️⬅️️ - движение. Доберись до зелёного выхода!</p>
+                    <div id="maze-area" style="width:600px;height:400px;background:#1a1a2e;margin:0 auto;border-radius:10px;position:relative;overflow:hidden;border:3px solid #0f3460">
+                        <div id="maze-player" style="width:25px;height:25px;background:#00d9ff;border-radius:50%;position:absolute;left:10px;top:187px;box-shadow:0 0 15px #00d9ff;z-index:10">🏃</div>
+                        <div id="maze-exit" style="width:40px;height:40px;background:#2ecc71;position:absolute;right:10px;top:180px;border-radius:5px;box-shadow:0 0 20px #2ecc71">🎯</div>
+                    </div>
+                    <button id="maze-finish" class="start-btn" style="margin-top:20px;display:none" onclick="showScene('after_maze')">ПРОДОЛЖИТЬ</button>
                 </div>
-                <button id="maze-finish" class="start-btn" style="margin-top:20px;display:none" onclick="showScene('after_maze')">ПРОДОЛЖИТЬ</button>
-            </div>
-        `,
-        onEnter: () => setTimeout(initMazeGame, 100)
+            `;
+        },
+        onEnter: () => {
+            console.log('🔷 maze_game: onEnter вызван');
+            setTimeout(() => {
+                console.log('🔷 maze_game: запускаю initMazeGame');
+                initMazeGame();
+            }, 300);
+        }
     },
     
     after_maze: {
@@ -45,7 +54,24 @@ const mazeScenes = {
     murka_snack_no: {
         name: "Мурка",
         text: "Ну, так найди!",
-        choices: [{ text: "НАЧАТЬ ПОИСК", next: 'after_puzzle' }]
+        choices: [{ text: "НАЧАТЬ ПОИСК", next: 'snack_puzzle_game' }]
+    },
+    
+    // === ИГРА С ПОИСКОМ ЛАКОМСТВА ===
+    snack_puzzle_game: {
+        name: "",
+        hideDialogue: true,
+        customContent: () => `
+            <div style="text-align:center;color:white;padding:20px">
+                <h2>🎁 Найди лакомство! 🎁</h2>
+                <p>Перетаскивай фигуры мышкой, чтобы найти спрятанное лакомство!</p>
+                <div id="puzzle-area" style="width:600px;height:400px;background:#2C3E50;margin:0 auto;border-radius:10px;position:relative;overflow:hidden;border:3px solid #34495E">
+                    <div id="snack-hidden" style="width:60px;height:60px;background:#F39C12;position:absolute;left:270px;top:170px;border-radius:50%;box-shadow:0 0 30px #F39C12;display:none;z-index:1">🦴</div>
+                </div>
+                <button id="puzzle-finish" class="start-btn" style="margin-top:20px;display:none" onclick="showScene('after_puzzle')">ПРОДОЛЖИТЬ</button>
+            </div>
+        `,
+        onEnter: () => setTimeout(initSnackPuzzle, 300)
     },
     
     after_puzzle: {
@@ -109,9 +135,17 @@ const mazeWalls = [
 ];
 
 function initMazeGame() {
+    console.log('🔷 initMazeGame: начало');
     const area = document.getElementById('maze-area');
     const player = document.getElementById('maze-player');
-    if (!area || !player) return;
+    
+    console.log('🔷 maze-area:', area);
+    console.log('🔷 maze-player:', player);
+    
+    if (!area || !player) {
+        console.error('❌ maze-area или maze-player не найдены!');
+        return;
+    }
     
     mazeActive = true;
     mazePlayerX = 10;
@@ -119,22 +153,33 @@ function initMazeGame() {
     player.style.left = mazePlayerX + 'px';
     player.style.top = mazePlayerY + 'px';
     
+    console.log('🔷 Игрок установлен в позицию:', mazePlayerX, mazePlayerY);
+    
+    // Очищаем старые стены если есть
+    const oldWalls = area.querySelectorAll('.maze-wall');
+    oldWalls.forEach(w => w.remove());
+    
     // Создаём стены
-    mazeWalls.forEach(wall => {
+    mazeWalls.forEach((wall, index) => {
         const wallEl = document.createElement('div');
         wallEl.className = 'maze-wall';
         wallEl.style.cssText = `position:absolute;left:${wall.x}px;top:${wall.y}px;width:${wall.w}px;height:${wall.h}px;background:#e94560;border-radius:5px;box-shadow:0 0 10px #e94560`;
         area.appendChild(wallEl);
+        console.log(`🔷 Стена ${index} создана:`, wall);
     });
     
     document.addEventListener('keydown', handleMazeInput);
+    console.log('🔷 Обработчик клавиш добавлен');
     
     // Проверка победы каждые 100мс
     mazeInterval = setInterval(() => {
         if (mazePlayerX > 550 && mazePlayerY > 180 && mazePlayerY < 220) {
+            console.log('✅ Лабиринт пройден!');
             endMazeGame();
         }
     }, 100);
+    
+    console.log('✅ initMazeGame: игра запущена');
 }
 
 function handleMazeInput(e) {
@@ -177,28 +222,196 @@ function handleMazeInput(e) {
 }
 
 function endMazeGame() {
+    console.log('🔷 endMazeGame: завершение игры');
     mazeActive = false;
     clearInterval(mazeInterval);
     document.removeEventListener('keydown', handleMazeInput);
     
     const btn = document.getElementById('maze-finish');
-    if (btn) btn.style.display = 'inline-block';
+    if (btn) {
+        btn.style.display = 'inline-block';
+        console.log('✅ Кнопка ПРОДОЛЖИТЬ показана');
+    } else {
+        console.error('❌ Кнопка maze-finish не найдена');
+    }
     
     // Удаляем стены
     document.querySelectorAll('.maze-wall').forEach(w => w.remove());
+}
+
+// === ИГРА С ПОИСКОМ ЛАКОМСТВА (ПАЗЛ) ===
+let puzzlePieces = [];
+let snackFound = false;
+
+function initSnackPuzzle() {
+    console.log('🔷 initSnackPuzzle: начало');
+    const area = document.getElementById('puzzle-area');
+    const snack = document.getElementById('snack-hidden');
+    
+    if (!area || !snack) {
+        console.error('❌ puzzle-area или snack-hidden не найдены!');
+        return;
+    }
+    
+    snackFound = false;
+    puzzlePieces = [];
+    
+    // Показываем лакомство
+    snack.style.display = 'block';
+    
+    // Создаём 6 геометрических фигур
+    const shapes = [
+        { width: 150, height: 100, left: 250, top: 150, color: '#E74C3C', borderRadius: '0', text: '■' },
+        { width: 120, height: 120, left: 280, top: 140, color: '#3498DB', borderRadius: '50%', text: '●' },
+        { width: 140, height: 100, left: 260, top: 160, color: '#2ECC71', borderRadius: '10px', text: '◆' },
+        { width: 100, height: 100, left: 300, top: 180, color: '#F39C12', borderRadius: '5px', text: '★' },
+        { width: 160, height: 80, left: 240, top: 190, color: '#9B59B6', borderRadius: '40px', text: '▲' },
+        { width: 130, height: 110, left: 270, top: 155, color: '#1ABC9C', borderRadius: '15px', text: '♥' }
+    ];
+    
+    shapes.forEach((shape, index) => {
+        const piece = document.createElement('div');
+        piece.className = 'puzzle-piece';
+        piece.style.cssText = `
+            position:absolute;
+            width:${shape.width}px;
+            height:${shape.height}px;
+            left:${shape.left}px;
+            top:${shape.top}px;
+            background:${shape.color};
+            border-radius:${shape.borderRadius};
+            cursor:grab;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:40px;
+            color:white;
+            box-shadow:0 5px 15px rgba(0,0,0,0.3);
+            z-index:${index};
+            user-select:none;
+        `;
+        piece.textContent = shape.text;
+        piece.dataset.index = index;
+        
+        // Drag functionality
+        piece.addEventListener('mousedown', startDrag);
+        piece.addEventListener('touchstart', startDrag, {passive: false});
+        
+        area.appendChild(piece);
+        puzzlePieces.push(piece);
+    });
+    
+    console.log('✅ initSnackPuzzle: фигуры созданы');
+}
+
+function startDrag(e) {
+    e.preventDefault();
+    const piece = e.target;
+    if (!piece.classList.contains('puzzle-piece')) return;
+    
+    piece.classList.add('dragging');
+    piece.style.zIndex = '100';
+    
+    const isTouch = e.type === 'touchstart';
+    const clientX = isTouch ? e.touches[0].clientX : e.clientX;
+    const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+    
+    const rect = piece.getBoundingClientRect();
+    const areaRect = document.getElementById('puzzle-area').getBoundingClientRect();
+    
+    let shiftX = clientX - rect.left;
+    let shiftY = clientY - rect.top;
+    
+    function moveAt(pageX, pageY) {
+        const areaRect = document.getElementById('puzzle-area').getBoundingClientRect();
+        let newX = pageX - areaRect.left - shiftX;
+        let newY = pageY - areaRect.top - shiftY;
+        
+        // Ограничения
+        if (newX < 0) newX = 0;
+        if (newY < 0) newY = 0;
+        if (newX > 540) newX = 540;
+        if (newY > 340) newY = 340;
+        
+        piece.style.left = newX + 'px';
+        piece.style.top = newY + 'px';
+        
+        checkSnackFound();
+    }
+    
+    function onMouseMove(event) {
+        const clientX = isTouch ? event.touches[0].clientX : event.clientX;
+        const clientY = isTouch ? event.touches[0].clientY : event.clientY;
+        moveAt(clientX, clientY);
+    }
+    
+    if (isTouch) {
+        document.addEventListener('touchmove', onMouseMove, {passive: false});
+        document.addEventListener('touchend', onMouseUp);
+    } else {
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    }
+    
+    function onMouseUp() {
+        piece.classList.remove('dragging');
+        piece.style.zIndex = piece.dataset.index;
+        if (isTouch) {
+            document.removeEventListener('touchmove', onMouseMove);
+            document.removeEventListener('touchend', onMouseUp);
+        } else {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
+    }
+}
+
+function checkSnackFound() {
+    if (snackFound) return;
+    
+    const snack = document.getElementById('snack-hidden');
+    const snackRect = snack.getBoundingClientRect();
+    let isVisible = true;
+    
+    puzzlePieces.forEach(piece => {
+        const pieceRect = piece.getBoundingClientRect();
+        // Проверяем перекрытие
+        if (pieceRect.left < snackRect.right &&
+            pieceRect.right > snackRect.left &&
+            pieceRect.top < snackRect.bottom &&
+            pieceRect.bottom > snackRect.top) {
+            isVisible = false;
+        }
+    });
+    
+    if (isVisible) {
+        snackFound = true;
+        snack.style.display = 'block';
+        snack.style.animation = 'pulse 0.5s infinite';
+        
+        setTimeout(() => {
+            alert(' Лакомство найдено!');
+            const btn = document.getElementById('puzzle-finish');
+            if (btn) btn.style.display = 'inline-block';
+        }, 300);
+    }
 }
 
 // === ВИКТОРИНА ===
 let currentQuizQuestions = [];
 
 function startQuizRound(index) {
+    console.log('🔷 Вопрос', index+1);
+    
     if (index >= 10) {
-        showScene('quiz_after');
+        console.log('✅ Викторина завершена, переход на quiz_after');
+        setTimeout(() => showScene('quiz_after'), 500);
         return;
     }
     
     if (index === 0) {
         currentQuizQuestions = getRandomQuestions(10);
+        console.log('🔷 Сгенерировано 10 вопросов');
     }
     
     const q = currentQuizQuestions[index];
@@ -208,7 +421,10 @@ function startQuizRound(index) {
         <div class="scene quiz">
             <div class="dialogue-box">
                 <div class="dialogue-name">Викторина</div>
-                <div class="dialogue-text"><strong>Вопрос ${index+1}/10:</strong><br>${q.q}</div>
+                <div class="dialogue-text">
+                    <strong>Вопрос ${index+1}/10:</strong><br>
+                    ${q.q}
+                </div>
                 <div class="choices">
                     ${q.a.map((ans, i) => `
                         <button class="choice-btn" onclick="answerQuiz(${i}, ${i===q.correct}, ${index+1})">
@@ -216,15 +432,20 @@ function startQuizRound(index) {
                         </button>
                     `).join('')}
                 </div>
-                <div style="margin-top:20px;font-size:18px">Счёт: <span id="qscore">${gameState.quizScore}</span>/10</div>
+                <div style="margin-top:20px;font-size:18px">
+                    Счёт: <span id="qscore">${gameState.quizScore}</span>/10
+                </div>
             </div>
         </div>
     `;
 }
 
 function answerQuiz(selected, isCorrect, nextIndex) {
+    console.log('🔷 Ответ:', selected, 'Правильно:', isCorrect, 'Следующий:', nextIndex);
     if (isCorrect) {
         gameState.quizScore++;
+        const scoreEl = document.getElementById('qscore');
+        if (scoreEl) scoreEl.textContent = gameState.quizScore;
     }
     setTimeout(() => startQuizRound(nextIndex), 300);
 }
