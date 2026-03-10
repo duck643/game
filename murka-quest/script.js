@@ -70,8 +70,8 @@ const questionBank = [
     { q: "Сколько будет 144 ÷ 12?", a: ["а) 10", "б) 12", "в) 14"], correct: 1 }
 ];
 
-// Функция получения 10 случайных уникальных вопросов
-function getRandomQuestions(count = 10) {
+// Функция получения 5 случайных уникальных вопросов
+function getRandomQuestions(count = 5) {
     const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
 }
