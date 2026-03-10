@@ -20,7 +20,7 @@ let snackFound = false;
 // === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ВИКТОРИНЫ ===
 let currentQuizQuestions = [];
 
-// === СЦЕНЫ ЛАБИРИНТА И ДАЛЕЕ ===
+// === СЦЕНЫ ===
 const mazeScenes = {
     maze_intro: {
         name: "Аноним",
@@ -28,7 +28,6 @@ const mazeScenes = {
         choices: [{ text: "НАЧАТЬ ЛАБИРИНТ", next: 'maze_game' }]
     },
     
-    // === ИГРА С ЛАБИРИНТОМ ===
     maze_game: {
         name: "",
         hideDialogue: true,
@@ -55,7 +54,6 @@ const mazeScenes = {
         ]
     },
     
-    // === ВСТРЕЧА С МУРКОЙ ===
     meet_murka: {
         name: "Мурка",
         text: (state) => `Привет, я Мурка. Мой друг сказал тебя зовут ${state.playerName}.\nДаже мне как Мурке странно. Ну ладно. Короче, я заигралась, поэтому кое-что для тебя потерялось.\nУ тебя есть лакомства? Не могу говорить на голодный желудок.`,
@@ -71,7 +69,6 @@ const mazeScenes = {
         choices: [{ text: "НАЧАТЬ ПОИСК", next: 'snack_puzzle_game' }]
     },
     
-    // === ИГРА С ПОИСКОМ ЛАКОМСТВА ===
     snack_puzzle_game: {
         name: "",
         hideDialogue: true,
@@ -106,7 +103,6 @@ const mazeScenes = {
         ]
     },
     
-    // === ЦИКЛ ВИКТОРИНЫ ===
     quiz_loop_intro: {
         name: "Аноним",
         text: "Ой, зря... Очень зря. Я наказываю тех, кто не любит Мурку. За это тебе надо правильно ответить на вопросы.",
@@ -118,7 +114,7 @@ const mazeScenes = {
         text: "Викторина: 5 вопросов из школьной программы. Поехали!",
         onEnter: () => {
             gameState.quizScore = 0;
-            gameState.askedQuestions = [];
+            currentQuizQuestions = [];
             startQuizRound(0);
         }
     },
@@ -139,7 +135,6 @@ const mazeScenes = {
 function initMazeGame() {
     const area = document.getElementById('maze-area');
     const player = document.getElementById('maze-player');
-    
     if (!area || !player) return;
     
     mazeActive = true;
@@ -148,10 +143,8 @@ function initMazeGame() {
     player.style.left = mazePlayerX + 'px';
     player.style.top = mazePlayerY + 'px';
     
-    // Очищаем старые стены
     area.querySelectorAll('.maze-wall').forEach(w => w.remove());
     
-    // Создаём стены
     mazeWalls.forEach(wall => {
         const wallEl = document.createElement('div');
         wallEl.className = 'maze-wall';
@@ -161,7 +154,6 @@ function initMazeGame() {
     
     document.addEventListener('keydown', handleMazeInput);
     
-    // Проверка победы
     mazeInterval = setInterval(() => {
         if (mazePlayerX > 550 && mazePlayerY > 180 && mazePlayerY < 220) {
             endMazeGame();
@@ -181,11 +173,9 @@ function handleMazeInput(e) {
     if (e.key === 'ArrowLeft') newX -= speed;
     if (e.key === 'ArrowRight') newX += speed;
     
-    // Границы
     if (newX < 0) newX = 0; if (newX > 575) newX = 575;
     if (newY < 0) newY = 0; if (newY > 375) newY = 375;
     
-    // Столкновения
     const playerRect = {left: newX, right: newX+25, top: newY, bottom: newY+25};
     let collision = false;
     
@@ -215,12 +205,11 @@ function endMazeGame() {
 }
 
 // ============================================
-// ФУНКЦИИ ПАЗЛА С ЛАКОМСТВОМ
+// ФУНКЦИИ ПАЗЛА
 // ============================================
 function initSnackPuzzle() {
     const area = document.getElementById('puzzle-area');
     const snack = document.getElementById('snack-hidden');
-    
     if (!area || !snack) return;
     
     snackFound = false;
@@ -374,6 +363,8 @@ function startQuizRound(index) {
 function answerQuiz(selected, isCorrect, nextIndex) {
     if (isCorrect) {
         gameState.quizScore++;
+        const scoreEl = document.getElementById('qscore');
+        if (scoreEl) scoreEl.textContent = gameState.quizScore;
     }
     setTimeout(() => startQuizRound(nextIndex), 300);
 }
