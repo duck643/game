@@ -94,7 +94,7 @@ function endQuiz() {
     
     // После викторины идём на финальные диалоги
     setTimeout(() => {
-        showScene('quiz_end');
+        showScene('quiz_after');
     }, 500);
 }
 
