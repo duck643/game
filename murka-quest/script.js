@@ -118,9 +118,8 @@ function resetGame() {
     };
 }
 
-// ============================================
 // ИНИЦИАЛИЗАЦИЯ
-// ============================================
+
 document.addEventListener('DOMContentLoaded', () => {
     // Регистрируем все сцены
     Object.assign(scenes, introScenes);
