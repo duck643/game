@@ -11,7 +11,7 @@ const parkScenes = {
     taxi_reaction: {
         name: "Аноним",
         text: "Ну ничего себе, зажравшиеся люди. Я денег не дам, у тебя есть?\nПошли пешком обгонять электросамокатчиков.",
-        choices: [{ text: "Ладно, играем", next: 'scooters_play_intro' }]
+        choices: [{ text: "НАЧАТЬ ИГРУ", next: 'scooters_game' }]
     },
     
     scooters_play_intro: {
@@ -55,9 +55,15 @@ const parkScenes = {
     
     park_optimist: {
         name: "Аноним",
-        text: "Оптимистов никто не любит... Пройди-ка тест:",
-        customContent: () => `<div style="text-align:center;margin:50px 0"><a href="https://duck643.github.io/testnormis/" target="_blank" class="start-btn">ОТКРЫТЬ ТЕСТ ↗</a></div>`,
-        choices: [{ text: "Прошёл тест. Далее", next: 'maze_intro' }]
+        text: "Оптимистов никто не любит... Пройди-ка тест:\nhttps://duck643.github.io/testnormis/",
+        customContent: () => `
+            <div style="text-align:center;margin:50px 0">
+                <a href="https://duck643.github.io/testnormis/" target="_blank" class="start-btn" style="display:inline-block;padding:20px 40px;font-size:24px;background:#9B59B6;color:white;text-decoration:none;border-radius:10px;margin-bottom:20px">
+                    ОТКРЫТЬ ТЕСТ ↗
+                </a>
+            </div>
+        `,
+        choices: [{ text: "Далее", next: 'maze_intro' }]
     }
 };
 
