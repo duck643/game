@@ -69,7 +69,7 @@ const parkScenes = {
     // === ПОСЛЕ ИГРЫ ===
     after_scooters: {
         name: "Мурка",
-        text: "Чпок... Всё не так безнадёжно. И вот мы в парке. Как тебе тут?",
+        text: "Чтош... Всё не так безнадёжно. И вот мы в парке. Как тебе тут?",
         choices: [
             { text: "а) Хочу домой", next: 'park_reaction_sad' },
             { text: "б) Ну норм", next: 'park_reaction_sad' },
