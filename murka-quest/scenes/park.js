@@ -54,18 +54,27 @@ const parkScenes = {
     },
     
     park_optimist: {
-        name: "Аноним",
-        text: "Оптимистов никто не любит... Пройди-ка тест:\nhttps://duck643.github.io/testnormis/",
-        customContent: () => `
-            <div style="text-align:center;margin:50px 0">
-                <a href="https://duck643.github.io/testnormis/" target="_blank" class="start-btn" style="display:inline-block;padding:20px 40px;font-size:24px;background:#9B59B6;color:white;text-decoration:none;border-radius:10px;margin-bottom:20px">
-                    ОТКРЫТЬ ТЕСТ ↗
+    name: "Аноним",
+    text: "Оптимистов никто не любит... Пройди-ка тест:\nhttps://duck643.github.io/testnormis/",
+    customContent: () => `
+        <div style="text-align:center;margin:50px 0;color:white">
+            <div class="dialogue-name">Аноним</div>
+            <div class="dialogue-text" style="margin:30px 0">
+                Оптимистов никто не любит... Пройди-ка тест:<br>
+                <a href="https://duck643.github.io/testnormis/" target="_blank" style="color:#9B59B6;font-size:20px">
+                    https://duck643.github.io/testnormis/
                 </a>
             </div>
-        `,
-        choices: [{ text: "Далее", next: 'maze_intro' }]
-    }
-};
+            <a href="https://duck643.github.io/testnormis/" target="_blank" class="start-btn" style="display:inline-block;padding:20px 40px;font-size:24px;background:#9B59B6;color:white;text-decoration:none;border-radius:10px;margin:20px">
+                ОТКРЫТЬ ТЕСТ ↗
+            </a>
+            <br>
+            <button class="start-btn" onclick="showScene('maze_intro')" style="margin-top:30px;padding:20px 60px;font-size:24px;background:#2ECC71">
+                ДАЛЕЕ
+            </button>
+        </div>
+    `
+}
 
 // === МИНИ-ИГРА С САМОКАТАМИ ===
 let gInterval, gSpawn, gY=175, gScore=0, gLives=3, gActive=false, gObs=[], gProj=[];
