@@ -1,3 +1,7 @@
+// === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ИГРЫ С САМОКАТАМИ ===
+let gInterval, gSpawn, gY=175, gScore=0, gLives=3, gActive=false, gObs=[], gProj=[];
+
+// === СЦЕНЫ ПАРКА ===
 const parkScenes = {
     scooters_choice: {
         name: "Аноним",
@@ -26,7 +30,7 @@ const parkScenes = {
         customContent: () => `
             <div style="text-align:center;color:white;padding:20px">
                 <h2>🛴 Обгоняй самокаты! 🎯</h2>
-                <p>Стрелки ⬆️⬇️ - движение, Пробел - стрельба</p>
+                <p>Стрелки ⬆️️ - движение, Пробел - стрельба</p>
                 <div style="font-size:20px;margin:10px">Счёт: <span id="gscore">0</span> | Жизни: <span id="glives">3</span></div>
                 <div id="garea" style="width:800px;height:400px;background:linear-gradient(to bottom,#1a1a2e,#16213e);margin:0 auto;border-radius:10px;position:relative;overflow:hidden;border:3px solid #0f3460">
                     <div id="gplayer" style="width:50px;height:50px;background:#00d9ff;border-radius:50%;position:absolute;left:50px;top:175px;box-shadow:0 0 20px #00d9ff">🏃</div>
@@ -54,31 +58,30 @@ const parkScenes = {
     },
     
     park_optimist: {
-    name: "Аноним",
-    text: "Оптимистов никто не любит... Пройди-ка тест:\nhttps://duck643.github.io/testnormis/",
-    customContent: () => `
-        <div style="text-align:center;margin:50px 0;color:white">
-            <div class="dialogue-name">Аноним</div>
-            <div class="dialogue-text" style="margin:30px 0">
-                Оптимистов никто не любит... Пройди-ка тест:<br>
-                <a href="https://duck643.github.io/testnormis/" target="_blank" style="color:#9B59B6;font-size:20px">
-                    https://duck643.github.io/testnormis/
+        name: "Аноним",
+        text: "Оптимистов никто не любит... Пройди-ка тест:\nhttps://duck643.github.io/testnormis/",
+        customContent: () => `
+            <div style="text-align:center;margin:50px 0;color:white">
+                <div class="dialogue-name">Аноним</div>
+                <div class="dialogue-text" style="margin:30px 0">
+                    Оптимистов никто не любит... Пройди-ка тест:<br>
+                    <a href="https://duck643.github.io/testnormis/" target="_blank" style="color:#9B59B6;font-size:20px">
+                        https://duck643.github.io/testnormis/
+                    </a>
+                </div>
+                <a href="https://duck643.github.io/testnormis/" target="_blank" class="start-btn" style="display:inline-block;padding:20px 40px;font-size:24px;background:#9B59B6;color:white;text-decoration:none;border-radius:10px;margin:20px">
+                    ОТКРЫТЬ ТЕСТ ↗
                 </a>
+                <br>
+                <button class="start-btn" onclick="showScene('maze_intro')" style="margin-top:30px;padding:20px 60px;font-size:24px;background:#2ECC71">
+                    ДАЛЕЕ
+                </button>
             </div>
-            <a href="https://duck643.github.io/testnormis/" target="_blank" class="start-btn" style="display:inline-block;padding:20px 40px;font-size:24px;background:#9B59B6;color:white;text-decoration:none;border-radius:10px;margin:20px">
-                ОТКРЫТЬ ТЕСТ ↗
-            </a>
-            <br>
-            <button class="start-btn" onclick="showScene('maze_intro')" style="margin-top:30px;padding:20px 60px;font-size:24px;background:#2ECC71">
-                ДАЛЕЕ
-            </button>
-        </div>
-    `
-}
+        `
+    }
+};
 
-// === МИНИ-ИГРА С САМОКАТАМИ ===
-let gInterval, gSpawn, gY=175, gScore=0, gLives=3, gActive=false, gObs=[], gProj=[];
-
+// === ФУНКЦИИ МИНИ-ИГРЫ С САМОКАТАМИ ===
 function initScootersGame() {
     const area = document.getElementById('garea'), player = document.getElementById('gplayer');
     if (!area || !player) return;
