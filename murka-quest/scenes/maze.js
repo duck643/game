@@ -1,3 +1,26 @@
+// === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ЛАБИРИНТА ===
+let mazePlayerX = 10, mazePlayerY = 187, mazeInterval, mazeActive = false;
+const mazeWalls = [
+    {x: 50, y: 0, w: 20, h: 150},
+    {x: 100, y: 100, w: 20, h: 200},
+    {x: 150, y: 0, w: 20, h: 180},
+    {x: 200, y: 220, w: 20, h: 180},
+    {x: 250, y: 50, w: 20, h: 200},
+    {x: 300, y: 0, w: 20, h: 120},
+    {x: 350, y: 150, w: 20, h: 250},
+    {x: 400, y: 0, w: 20, h: 200},
+    {x: 450, y: 250, w: 20, h: 150},
+    {x: 500, y: 80, w: 20, h: 200}
+];
+
+// === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ПАЗЛА ===
+let puzzlePieces = [];
+let snackFound = false;
+
+// === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ВИКТОРИНЫ ===
+let currentQuizQuestions = [];
+
+// === СЦЕНЫ ЛАБИРИНТА И ДАЛЕЕ ===
 const mazeScenes = {
     maze_intro: {
         name: "Аноним",
@@ -9,27 +32,18 @@ const mazeScenes = {
     maze_game: {
         name: "",
         hideDialogue: true,
-        customContent: () => {
-            console.log('🔷 maze_game: customContent вызван');
-            return `
-                <div style="text-align:center;color:white;padding:20px">
-                    <h2>🌀 Пройди лабиринт! 🎯</h2>
-                    <p>Стрелки ⬆️️⬅️️ - движение. Доберись до зелёного выхода!</p>
-                    <div id="maze-area" style="width:600px;height:400px;background:#1a1a2e;margin:0 auto;border-radius:10px;position:relative;overflow:hidden;border:3px solid #0f3460">
-                        <div id="maze-player" style="width:25px;height:25px;background:#00d9ff;border-radius:50%;position:absolute;left:10px;top:187px;box-shadow:0 0 15px #00d9ff;z-index:10">🏃</div>
-                        <div id="maze-exit" style="width:40px;height:40px;background:#2ecc71;position:absolute;right:10px;top:180px;border-radius:5px;box-shadow:0 0 20px #2ecc71">🎯</div>
-                    </div>
-                    <button id="maze-finish" class="start-btn" style="margin-top:20px;display:none" onclick="showScene('after_maze')">ПРОДОЛЖИТЬ</button>
+        customContent: () => `
+            <div style="text-align:center;color:white;padding:20px">
+                <h2>🌀 Пройди лабиринт! 🎯</h2>
+                <p>Стрелки ⬆️⬇️⬅️➡️ - движение. Доберись до зелёного выхода!</p>
+                <div id="maze-area" style="width:600px;height:400px;background:#1a1a2e;margin:0 auto;border-radius:10px;position:relative;overflow:hidden;border:3px solid #0f3460">
+                    <div id="maze-player" style="width:25px;height:25px;background:#00d9ff;border-radius:50%;position:absolute;left:10px;top:187px;box-shadow:0 0 15px #00d9ff;z-index:10">🏃</div>
+                    <div id="maze-exit" style="width:40px;height:40px;background:#2ecc71;position:absolute;right:10px;top:180px;border-radius:5px;box-shadow:0 0 20px #2ecc71">🎯</div>
                 </div>
-            `;
-        },
-        onEnter: () => {
-            console.log('🔷 maze_game: onEnter вызван');
-            setTimeout(() => {
-                console.log('🔷 maze_game: запускаю initMazeGame');
-                initMazeGame();
-            }, 300);
-        }
+                <button id="maze-finish" class="start-btn" style="margin-top:20px;display:none" onclick="showScene('after_maze')">ПРОДОЛЖИТЬ</button>
+            </div>
+        `,
+        onEnter: () => setTimeout(initMazeGame, 300)
     },
     
     after_maze: {
@@ -101,7 +115,7 @@ const mazeScenes = {
     
     quiz_start: {
         name: "Аноним",
-        text: "Викторина: 10 вопросов из школьной программы. Поехали!",
+        text: "Викторина: 5 вопросов из школьной программы. Поехали!",
         onEnter: () => {
             gameState.quizScore = 0;
             gameState.askedQuestions = [];
@@ -111,7 +125,7 @@ const mazeScenes = {
     
     quiz_after: {
         name: "Аноним",
-        text: (state) => `Ладно, ты прощён. Твой счёт: ${state.quizScore}/10.`,
+        text: (state) => `Ладно, ты прощён. Твой счёт: ${state.quizScore}/5.`,
         choices: [
             { text: "а) Поговорить с Муркой", next: 'meet_murka' },
             { text: "б) Не говорить с Муркой", next: 'quiz_loop_intro' }
@@ -119,33 +133,14 @@ const mazeScenes = {
     }
 };
 
-// === ИГРА С ЛАБИРИНТОМ ===
-let mazePlayerX = 10, mazePlayerY = 187, mazeInterval, mazeActive = false;
-const mazeWalls = [
-    {x: 50, y: 0, w: 20, h: 150},
-    {x: 100, y: 100, w: 20, h: 200},
-    {x: 150, y: 0, w: 20, h: 180},
-    {x: 200, y: 220, w: 20, h: 180},
-    {x: 250, y: 50, w: 20, h: 200},
-    {x: 300, y: 0, w: 20, h: 120},
-    {x: 350, y: 150, w: 20, h: 250},
-    {x: 400, y: 0, w: 20, h: 200},
-    {x: 450, y: 250, w: 20, h: 150},
-    {x: 500, y: 80, w: 20, h: 200}
-];
-
+// ============================================
+// ФУНКЦИИ ЛАБИРИНТА
+// ============================================
 function initMazeGame() {
-    console.log('🔷 initMazeGame: начало');
     const area = document.getElementById('maze-area');
     const player = document.getElementById('maze-player');
     
-    console.log('🔷 maze-area:', area);
-    console.log('🔷 maze-player:', player);
-    
-    if (!area || !player) {
-        console.error('❌ maze-area или maze-player не найдены!');
-        return;
-    }
+    if (!area || !player) return;
     
     mazeActive = true;
     mazePlayerX = 10;
@@ -153,41 +148,32 @@ function initMazeGame() {
     player.style.left = mazePlayerX + 'px';
     player.style.top = mazePlayerY + 'px';
     
-    console.log('🔷 Игрок установлен в позицию:', mazePlayerX, mazePlayerY);
-    
-    // Очищаем старые стены если есть
-    const oldWalls = area.querySelectorAll('.maze-wall');
-    oldWalls.forEach(w => w.remove());
+    // Очищаем старые стены
+    area.querySelectorAll('.maze-wall').forEach(w => w.remove());
     
     // Создаём стены
-    mazeWalls.forEach((wall, index) => {
+    mazeWalls.forEach(wall => {
         const wallEl = document.createElement('div');
         wallEl.className = 'maze-wall';
         wallEl.style.cssText = `position:absolute;left:${wall.x}px;top:${wall.y}px;width:${wall.w}px;height:${wall.h}px;background:#e94560;border-radius:5px;box-shadow:0 0 10px #e94560`;
         area.appendChild(wallEl);
-        console.log(`🔷 Стена ${index} создана:`, wall);
     });
     
     document.addEventListener('keydown', handleMazeInput);
-    console.log('🔷 Обработчик клавиш добавлен');
     
-    // Проверка победы каждые 100мс
+    // Проверка победы
     mazeInterval = setInterval(() => {
         if (mazePlayerX > 550 && mazePlayerY > 180 && mazePlayerY < 220) {
-            console.log('✅ Лабиринт пройден!');
             endMazeGame();
         }
     }, 100);
-    
-    console.log('✅ initMazeGame: игра запущена');
 }
 
 function handleMazeInput(e) {
     const player = document.getElementById('maze-player');
     if (!player || !mazeActive) return;
     
-    let newX = mazePlayerX;
-    let newY = mazePlayerY;
+    let newX = mazePlayerX, newY = mazePlayerY;
     const speed = 5;
     
     if (e.key === 'ArrowUp') newY -= speed;
@@ -195,18 +181,16 @@ function handleMazeInput(e) {
     if (e.key === 'ArrowLeft') newX -= speed;
     if (e.key === 'ArrowRight') newX += speed;
     
-    // Проверка границ
-    if (newX < 0) newX = 0;
-    if (newX > 575) newX = 575;
-    if (newY < 0) newY = 0;
-    if (newY > 375) newY = 375;
+    // Границы
+    if (newX < 0) newX = 0; if (newX > 575) newX = 575;
+    if (newY < 0) newY = 0; if (newY > 375) newY = 375;
     
-    // Проверка столкновений со стенами
-    const playerRect = {left: newX, right: newX + 25, top: newY, bottom: newY + 25};
+    // Столкновения
+    const playerRect = {left: newX, right: newX+25, top: newY, bottom: newY+25};
     let collision = false;
     
     mazeWalls.forEach(wall => {
-        const wallRect = {left: wall.x, right: wall.x + wall.w, top: wall.y, bottom: wall.y + wall.h};
+        const wallRect = {left: wall.x, right: wall.x+wall.w, top: wall.y, bottom: wall.y+wall.h};
         if (playerRect.left < wallRect.right && playerRect.right > wallRect.left &&
             playerRect.top < wallRect.bottom && playerRect.bottom > wallRect.top) {
             collision = true;
@@ -222,44 +206,27 @@ function handleMazeInput(e) {
 }
 
 function endMazeGame() {
-    console.log('🔷 endMazeGame: завершение игры');
     mazeActive = false;
     clearInterval(mazeInterval);
     document.removeEventListener('keydown', handleMazeInput);
-    
     const btn = document.getElementById('maze-finish');
-    if (btn) {
-        btn.style.display = 'inline-block';
-        console.log('✅ Кнопка ПРОДОЛЖИТЬ показана');
-    } else {
-        console.error('❌ Кнопка maze-finish не найдена');
-    }
-    
-    // Удаляем стены
+    if (btn) btn.style.display = 'inline-block';
     document.querySelectorAll('.maze-wall').forEach(w => w.remove());
 }
 
-// === ИГРА С ПОИСКОМ ЛАКОМСТВА (ПАЗЛ) ===
-let puzzlePieces = [];
-let snackFound = false;
-
+// ============================================
+// ФУНКЦИИ ПАЗЛА С ЛАКОМСТВОМ
+// ============================================
 function initSnackPuzzle() {
-    console.log('🔷 initSnackPuzzle: начало');
     const area = document.getElementById('puzzle-area');
     const snack = document.getElementById('snack-hidden');
     
-    if (!area || !snack) {
-        console.error('❌ puzzle-area или snack-hidden не найдены!');
-        return;
-    }
+    if (!area || !snack) return;
     
     snackFound = false;
     puzzlePieces = [];
-    
-    // Показываем лакомство
     snack.style.display = 'block';
     
-    // Создаём 6 геометрических фигур
     const shapes = [
         { width: 150, height: 100, left: 250, top: 150, color: '#E74C3C', borderRadius: '0', text: '■' },
         { width: 120, height: 120, left: 280, top: 140, color: '#3498DB', borderRadius: '50%', text: '●' },
@@ -272,36 +239,14 @@ function initSnackPuzzle() {
     shapes.forEach((shape, index) => {
         const piece = document.createElement('div');
         piece.className = 'puzzle-piece';
-        piece.style.cssText = `
-            position:absolute;
-            width:${shape.width}px;
-            height:${shape.height}px;
-            left:${shape.left}px;
-            top:${shape.top}px;
-            background:${shape.color};
-            border-radius:${shape.borderRadius};
-            cursor:grab;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:40px;
-            color:white;
-            box-shadow:0 5px 15px rgba(0,0,0,0.3);
-            z-index:${index};
-            user-select:none;
-        `;
+        piece.style.cssText = `position:absolute;width:${shape.width}px;height:${shape.height}px;left:${shape.left}px;top:${shape.top}px;background:${shape.color};border-radius:${shape.borderRadius};cursor:grab;display:flex;align-items:center;justify-content:center;font-size:40px;color:white;box-shadow:0 5px 15px rgba(0,0,0,0.3);z-index:${index};user-select:none`;
         piece.textContent = shape.text;
         piece.dataset.index = index;
-        
-        // Drag functionality
         piece.addEventListener('mousedown', startDrag);
         piece.addEventListener('touchstart', startDrag, {passive: false});
-        
         area.appendChild(piece);
         puzzlePieces.push(piece);
     });
-    
-    console.log('✅ initSnackPuzzle: фигуры созданы');
 }
 
 function startDrag(e) {
@@ -315,7 +260,6 @@ function startDrag(e) {
     const isTouch = e.type === 'touchstart';
     const clientX = isTouch ? e.touches[0].clientX : e.clientX;
     const clientY = isTouch ? e.touches[0].clientY : e.clientY;
-    
     const rect = piece.getBoundingClientRect();
     const areaRect = document.getElementById('puzzle-area').getBoundingClientRect();
     
@@ -326,23 +270,17 @@ function startDrag(e) {
         const areaRect = document.getElementById('puzzle-area').getBoundingClientRect();
         let newX = pageX - areaRect.left - shiftX;
         let newY = pageY - areaRect.top - shiftY;
-        
-        // Ограничения
-        if (newX < 0) newX = 0;
-        if (newY < 0) newY = 0;
-        if (newX > 540) newX = 540;
-        if (newY > 340) newY = 340;
-        
+        if (newX < 0) newX = 0; if (newX > 540) newX = 540;
+        if (newY < 0) newY = 0; if (newY > 340) newY = 340;
         piece.style.left = newX + 'px';
         piece.style.top = newY + 'px';
-        
         checkSnackFound();
     }
     
     function onMouseMove(event) {
-        const clientX = isTouch ? event.touches[0].clientX : event.clientX;
-        const clientY = isTouch ? event.touches[0].clientY : event.clientY;
-        moveAt(clientX, clientY);
+        const cX = isTouch ? event.touches[0].clientX : event.clientX;
+        const cY = isTouch ? event.touches[0].clientY : event.clientY;
+        moveAt(cX, cY);
     }
     
     if (isTouch) {
@@ -368,18 +306,14 @@ function startDrag(e) {
 
 function checkSnackFound() {
     if (snackFound) return;
-    
     const snack = document.getElementById('snack-hidden');
     const snackRect = snack.getBoundingClientRect();
     let isVisible = true;
     
     puzzlePieces.forEach(piece => {
         const pieceRect = piece.getBoundingClientRect();
-        // Проверяем перекрытие
-        if (pieceRect.left < snackRect.right &&
-            pieceRect.right > snackRect.left &&
-            pieceRect.top < snackRect.bottom &&
-            pieceRect.bottom > snackRect.top) {
+        if (pieceRect.left < snackRect.right && pieceRect.right > snackRect.left &&
+            pieceRect.top < snackRect.bottom && pieceRect.bottom > snackRect.top) {
             isVisible = false;
         }
     });
@@ -388,30 +322,27 @@ function checkSnackFound() {
         snackFound = true;
         snack.style.display = 'block';
         snack.style.animation = 'pulse 0.5s infinite';
-        
         setTimeout(() => {
-            alert(' Лакомство найдено!');
+            alert('🎁 Лакомство найдено!');
             const btn = document.getElementById('puzzle-finish');
             if (btn) btn.style.display = 'inline-block';
         }, 300);
     }
 }
 
-// === ВИКТОРИНА ===
-let currentQuizQuestions = [];
-
+// ============================================
+// ФУНКЦИИ ВИКТОРИНЫ (5 вопросов)
+// ============================================
 function startQuizRound(index) {
-    console.log('🔷 Вопрос', index+1);
-    
-    if (index >= 10) {
-        console.log('✅ Викторина завершена, переход на quiz_after');
+    // Завершаем после 5 вопросов
+    if (index >= 5) {
         setTimeout(() => showScene('quiz_after'), 500);
         return;
     }
     
+    // Генерируем 5 случайных вопросов при старте
     if (index === 0) {
-        currentQuizQuestions = getRandomQuestions(10);
-        console.log('🔷 Сгенерировано 10 вопросов');
+        currentQuizQuestions = getRandomQuestions(5);
     }
     
     const q = currentQuizQuestions[index];
@@ -422,7 +353,7 @@ function startQuizRound(index) {
             <div class="dialogue-box">
                 <div class="dialogue-name">Викторина</div>
                 <div class="dialogue-text">
-                    <strong>Вопрос ${index+1}/10:</strong><br>
+                    <strong>Вопрос ${index+1}/5:</strong><br>
                     ${q.q}
                 </div>
                 <div class="choices">
@@ -433,7 +364,7 @@ function startQuizRound(index) {
                     `).join('')}
                 </div>
                 <div style="margin-top:20px;font-size:18px">
-                    Счёт: <span id="qscore">${gameState.quizScore}</span>/10
+                    Счёт: <span id="qscore">${gameState.quizScore}</span>/5
                 </div>
             </div>
         </div>
@@ -441,11 +372,8 @@ function startQuizRound(index) {
 }
 
 function answerQuiz(selected, isCorrect, nextIndex) {
-    console.log('🔷 Ответ:', selected, 'Правильно:', isCorrect, 'Следующий:', nextIndex);
     if (isCorrect) {
         gameState.quizScore++;
-        const scoreEl = document.getElementById('qscore');
-        if (scoreEl) scoreEl.textContent = gameState.quizScore;
     }
     setTimeout(() => startQuizRound(nextIndex), 300);
 }
